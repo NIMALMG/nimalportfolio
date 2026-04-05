@@ -36,7 +36,7 @@ export default function About() {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="w-full bg-[#fbfbfb] py-32 lg:py-48 relative border-t border-gray-100">
+    <section id="about" ref={sectionRef} className="w-full bg-[#fbfbfb] py-20 md:py-32 lg:py-48 relative border-t border-gray-100">
       <div className="section-wrapper relative z-10 flex flex-col md:flex-row items-start justify-between gap-12">
         
         {/* Left Side Label */}

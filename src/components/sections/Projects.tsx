@@ -78,7 +78,7 @@ export default function Projects() {
   }, []);
 
   return (
-    <section id="work" ref={sectionRef} className="w-full bg-[#fbfbfb] py-32 lg:py-48 relative overflow-hidden border-t border-gray-100">
+    <section id="work" ref={sectionRef} className="w-full bg-[#fbfbfb] py-20 md:py-32 lg:py-48 relative overflow-hidden border-t border-gray-100">
       
       <div className="section-wrapper relative z-10 flex flex-col items-center">
         

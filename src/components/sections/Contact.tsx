@@ -35,7 +35,7 @@ export default function Contact() {
   }, []);
 
   return (
-    <section id="contact" ref={sectionRef} className="w-full bg-[#fbfbfb] pt-32 pb-64 lg:pt-48 relative overflow-hidden border-t border-gray-100">
+    <section id="contact" ref={sectionRef} className="w-full bg-[#fbfbfb] pt-20 pb-32 md:pt-32 md:pb-64 lg:pt-48 relative overflow-hidden border-t border-gray-100">
       
       {/* Absolute Ambient Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

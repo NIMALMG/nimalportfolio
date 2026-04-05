@@ -11,23 +11,17 @@ const services = [
   {
     title: "Premium Web Design",
     description: "I craft beautiful, modern, and user-centric interfaces tailored to your brand identity, guaranteeing an Awwwards-tier level of interaction.",
-    icon: <Palette className="w-10 h-10 text-white" />,
-    lightColor: "from-blue-500/20 to-transparent",
-    borderColor: "group-hover:border-blue-500/50"
+    icon: <Palette className="w-8 h-8 text-gray-900" />,
   },
   {
-    title: "Full Website Redesign",
-    description: "Transform your old, outdated site into a highly-converting modern masterpiece leveraging the latest React & GSAP frameworks.",
-    icon: <MonitorSmartphone className="w-10 h-10 text-white" />,
-    lightColor: "from-purple-500/20 to-transparent",
-    borderColor: "group-hover:border-purple-500/50"
+    title: "Next.js Development",
+    description: "Transform your old, outdated site into a highly-converting modern masterpiece leveraging the latest React frameworks.",
+    icon: <MonitorSmartphone className="w-8 h-8 text-gray-900" />,
   },
   {
-    title: "Performance Optimization",
+    title: "SEO Optimization",
     description: "I ensure your site loads blazingly fast, cracking top-tier Lighthouse scores to radically boost SEO and skyrocket customer retention.",
-    icon: <BarChart className="w-10 h-10 text-white" />,
-    lightColor: "from-green-500/20 to-transparent",
-    borderColor: "group-hover:border-green-500/50"
+    icon: <BarChart className="w-8 h-8 text-gray-900" />,
   },
 ];
 
@@ -40,11 +34,10 @@ export default function Services() {
       // 1. Title Entrance
       gsap.fromTo(
         ".services-heading",
-        { y: 50, opacity: 0, filter: "blur(10px)" },
+        { y: 50, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          filter: "blur(0px)",
           duration: 1.2,
           ease: "expo.out",
           scrollTrigger: {
@@ -55,103 +48,102 @@ export default function Services() {
         }
       );
 
-      // 2. Heavy Stagger Cards Entrance
+      // 2. SVG Swoosh Drawing Animation
+      gsap.fromTo(
+        ".svg-swoosh",
+        { strokeDasharray: "400", strokeDashoffset: "400" },
+        {
+          strokeDashoffset: 0,
+          duration: 1,
+          ease: "power2.out",
+          delay: 0.5,
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 80%",
+            toggleActions: "play pause resume reverse"
+          }
+        }
+      );
+
+      // 3. Staggered Minimal Cards
       gsap.fromTo(
         cardsRef.current,
-        { y: 150, opacity: 0, rotateX: 15, scale: 0.95 },
+        { y: 50, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          rotateX: 0,
-          scale: 1,
-          duration: 1.5,
-          stagger: 0.2, // Smooth delay entry
-          ease: "power3.out",
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "back.out(1.2)",
           scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 65%",
+            trigger: ".services-grid",
+            start: "top 85%",
             toggleActions: "play pause resume reverse"
-          },
+          }
         }
       );
+
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section id="services" className="relative py-32 px-6 md:px-12 overflow-hidden bg-white" ref={containerRef}>
+    <section id="services" ref={containerRef} className="w-full bg-white py-20 md:py-32 lg:py-48 relative z-10 overflow-hidden">
       
-      {/* Background Soft Deep Glows */}
-      <div className="absolute top-0 right-0 w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] bg-purple-100 rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/4" />
-      <div className="absolute bottom-0 left-0 w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] bg-blue-50 rounded-full blur-[150px] pointer-events-none translate-y-1/2 -translate-x-1/4" />
+      {/* Minimal Background Layer */}
+      <div className="absolute inset-0 z-0 bg-[#fbfbfb] pointer-events-none opacity-50"></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto flex flex-col items-center">
+      <div className="section-wrapper relative z-10 flex flex-col items-center">
         
-        {/* Updated Heading */}
-        <div className="services-heading text-center mb-24 flex flex-col items-center">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm mb-6">
-            <span className="w-2 h-2 rounded-full bg-var(--accentColor) animate-pulse"></span>
-            <span className="text-xs font-semibold tracking-[0.25em] text-gray-500 uppercase">
-              What I Offer
+        {/* Massive Screenshot-matched Hero Header */}
+        <div className="services-heading text-center mb-24 max-w-5xl mx-auto px-4 flex flex-col items-center">
+          <h2 className="text-[2.5rem] sm:text-6xl md:text-7xl lg:text-[5.5rem] font-sans font-semibold text-gray-900 tracking-tight leading-[1.1] mb-8">
+            We build websites that <br className="hidden md:block"/>
+            <span className="relative inline-block pb-2 outline-none">
+              grow your business
+              {/* Green SVG Swoosh strictly matching screenshot */}
+              <svg className="absolute -bottom-1 md:-bottom-2 left-0 w-full text-emerald-400 h-4 md:h-6 pointer-events-none" viewBox="0 0 400 20" fill="none" preserveAspectRatio="none">
+                <path d="M5 15Q 200 0 395 15" stroke="currentColor" strokeWidth="8" strokeLinecap="round" className="svg-swoosh"/>
+              </svg>
             </span>
-          </span>
-          <h2 className="text-5xl md:text-7xl font-serif font-bold text-gray-900 tracking-wide uppercase" style={{ letterSpacing: "2px" }}>
-            My Services
           </h2>
-          <p className="mt-6 text-gray-400 font-light text-lg md:text-xl max-w-2xl text-center leading-relaxed">
-            Delivering high-performance, agency-grade digital experiences tailored to dominate your market.
+          
+          <p className="text-gray-500 text-lg sm:text-xl md:text-2xl font-light leading-relaxed max-w-4xl mb-12">
+            Premium web design, Next.js development, and SEO optimization. We deliver stunning, high-performing websites tailored to scale your brand.
           </p>
+          
+          {/* Black Glow CTA Button */}
+          <a href="#contact" className="group relative overflow-hidden rounded-full bg-gray-900 px-10 py-5 text-white shadow-xl shadow-gray-900/20 hover-lift font-medium flex items-center justify-center gap-3 transition-all" style={{ color: "#ffffff" }}>
+            <span className="relative z-10 flex items-center text-white gap-3">
+              <svg className="w-5 h-5 text-gray-300 group-hover:rotate-12 transition-transform drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              Book a Call
+            </span>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          </a>
         </div>
 
-        {/* Large Premium Cards Layout */}
-        <div className="w-full flex flex-col gap-6 lg:gap-10 perspective-1000">
+        {/* Muted Minimal Services Grid */}
+        <div className="services-grid w-full grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-7xl px-4">
           {services.map((service, index) => (
             <div
               key={index}
-              ref={(el) => {
-                cardsRef.current[index] = el;
-              }}
-              className={`group relative w-full flex flex-col md:flex-row items-center p-8 md:p-12 rounded-[2rem] bg-white border border-gray-100 hover:border-var(--accentColor) transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-4 hover:shadow-[0_40px_80px_rgba(124,58,237,0.08)] shadow-[0_10px_30px_rgba(0,0,0,0.02)] overflow-hidden ${service.borderColor} cursor-pointer`}
+              ref={(el) => { cardsRef.current[index] = el; }}
+              className="group relative flex flex-col p-10 bg-white border border-gray-100 rounded-[2rem] hover:shadow-xl hover:shadow-gray-100 transition-all duration-500 overflow-hidden"
             >
+              {/* Minimal Top Icon */}
+              <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+                {service.icon}
+              </div>
               
-              {/* Internal Dynamic Reveal Gradient */}
-              <div className={`absolute inset-0 bg-gradient-to-r ${service.lightColor} opacity-0 group-hover:opacity-10 transition-opacity duration-700`} />
-
-              {/* Light Sweep Effect */}
-              <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-gradient-to-r from-transparent via-purple-500/5 to-transparent skew-x-[-25deg] group-hover:animate-[sweep_1.5s_ease-out_1]" />
-
-              <div className="w-full md:w-1/3 flex items-center justify-center md:justify-start mb-8 md:mb-0 relative z-10">
-                <div className="w-24 h-24 rounded-3xl bg-gray-50 border border-gray-200 flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:rotate-[15deg] transition-all duration-700 ease-out">
-                  <div className="text-gray-700 group-hover:text-var(--accentColor) transition-colors">
-                    {React.cloneElement(service.icon, { className: "w-10 h-10" })}
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full md:w-2/3 flex flex-col items-center md:items-start text-center md:text-left relative z-10">
-                <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 transition-colors duration-500 uppercase" style={{ letterSpacing: "1px" }}>
-                  {service.title}
-                </h3>
-                <p className="text-gray-500 text-lg leading-relaxed max-w-xl">
-                  {service.description}
-                </p>
-              </div>
-
-              {/* Minimal Decorative Corner Crosses */}
-              <div className="absolute top-6 right-6 text-gray-200 group-hover:text-var(--accentColor) transition-colors duration-500">+</div>
-              <div className="absolute bottom-6 left-6 text-gray-200 group-hover:text-var(--accentColor) transition-colors duration-500">+</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h3>
+              <p className="text-gray-500 leading-relaxed">{service.description}</p>
             </div>
           ))}
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes sweep {
-          0% { left: -100%; }
-          100% { left: 200%; }
-        }
-      `}</style>
     </section>
   );
 }
