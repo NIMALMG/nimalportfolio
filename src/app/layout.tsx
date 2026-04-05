@@ -1,20 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import Header from "@/components/layout/Header";
 import Preloader from "@/components/ui/Preloader";
-import CustomCursor from "@/components/ui/CustomCursor";
-
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Nimal | Freelance Web Developer",
@@ -27,16 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${outfit.variable} h-full antialiased`}
-    >
-      <body className="font-sans bg-black text-white selection:bg-blue-600 selection:text-white md:cursor-none">
+    <html lang="en" className="h-full antialiased">
+      <body className="font-sans antialiased bg-[#fbfbfb] text-gray-900 transition-colors duration-500 selection:bg-var(--accentColor) selection:text-white overflow-x-hidden">
         <Preloader />
-        <CustomCursor />
         <SmoothScroll>
           <Header />
-          <main className="relative min-h-screen">
+          <main className="relative">
             {children}
           </main>
         </SmoothScroll>

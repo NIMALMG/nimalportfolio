@@ -1,209 +1,194 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { TextPlugin } from "gsap/TextPlugin";
 import Image from "next/image";
-
-gsap.registerPlugin(TextPlugin);
+import gsap from "gsap";
 
 export default function Hero() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const iamRef = useRef<HTMLDivElement>(null);
-  const nameRef = useRef<HTMLHeadingElement>(null);
-  const roleRef = useRef<HTMLDivElement>(null);
-  const descRef = useRef<HTMLDivElement>(null);
-  
-  // Image Refs
-  const slice1Ref = useRef<HTMLDivElement>(null);
-  const slice2Ref = useRef<HTMLDivElement>(null);
-  const slice3Ref = useRef<HTMLDivElement>(null);
-  const slice4Ref = useRef<HTMLDivElement>(null);
-  
-  // Outer Container
-  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const imageInnerRef = useRef<HTMLDivElement>(null);
+  const lightRef = useRef<HTMLDivElement>(null);
+  const headingRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    // Wait for preloader to finish
-    const tl = gsap.timeline({ delay: 3.5 }); // Preloader takes ~3.5s now
+    const ctx = gsap.context(() => {
+      // ── ENTRANCE ANIMATION ──
+      const tl = gsap.timeline();
+      
+      // Staggered text reveal
+      tl.fromTo(
+        headingRefs.current,
+        { y: 80, opacity: 0, rotateX: -20 },
+        { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.15, ease: "power3.out" }
+      );
 
-    gsap.set(sectionRef.current, { opacity: 1 });
+      // Image reveal
+      tl.fromTo(
+        ".hero-image-wrapper",
+        { scale: 0.9, opacity: 0, filter: "blur(20px)" },
+        { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "expo.out" },
+        "-=0.8"
+      );
 
-    // Step 1: Advanced Image Slices (No distortion!)
-    tl.fromTo(
-      slice2Ref.current,
-      { y: "-100%" },
-      { y: "0%", duration: 1.5, ease: "expo.out" },
-      0
-    )
-    .fromTo(
-      slice3Ref.current,
-      { y: "100%" },
-      { y: "0%", duration: 1.5, ease: "expo.out" },
-      0
-    )
-    .fromTo(
-      [slice1Ref.current, slice4Ref.current],
-      { opacity: 0, filter: "blur(10px)" },
-      { opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power3.out" },
-      0.5
-    )
-
-    // Dynamic scale to entire image container
-    .fromTo(
-      imageContainerRef.current,
-      { scale: 1.1 },
-      { scale: 1, duration: 2, ease: "power2.out" },
-      0
-    )
-
-    // Step 2: "I am" Typing Animation
-    .to(iamRef.current, {
-      text: "I am",
-      duration: 0.6,
-      ease: "none"
-    }, 1.2)
-
-    // Step 3: Huge Name Cinematic Reveal
-    tl.fromTo(
-      nameRef.current,
-      { opacity: 0, scale: 0.9, rotateX: -30, filter: "blur(15px)", y: 50 },
-      { opacity: 1, scale: 1, rotateX: 0, filter: "blur(0px)", y: 0, duration: 2, ease: "expo.out" },
-      1.5
-    )
-
-    // Step 4: Role Typing Animation with scramble effect
-    tl.to(roleRef.current, {
-      text: "a Frontend Developer",
-      duration: 1.2,
-      ease: "none"
-    }, 2)
-
-    // Step 5: Description text cinematic fade-in
-    tl.fromTo(
-      descRef.current,
-      { y: 30, opacity: 0, filter: "blur(5px)" },
-      { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power3.out" },
-      3.2
-    );
-
-    // Advanced 3D Hover Tilt on the image container
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!imageContainerRef.current) return;
-      const rect = imageContainerRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-
-      gsap.to(imageContainerRef.current, {
-        rotationY: x / 30,
-        rotationX: -y / 30,
-        ease: "power2.out",
-        duration: 0.8,
-        transformPerspective: 1000
+      // Continuous float animation for the image
+      gsap.to(".hero-image-wrapper", {
+        y: -15,
+        repeat: -1,
+        yoyo: true,
+        duration: 4,
+        ease: "sine.inOut"
       });
-    };
 
-    const handleMouseLeave = () => {
-      if (!imageContainerRef.current) return;
-      gsap.to(imageContainerRef.current, {
-        rotationY: 0,
-        rotationX: 0,
-        ease: "power3.out",
-        duration: 1,
-      });
-    };
+      // ── 3D MOUSE TILT ──
+      gsap.set(imageInnerRef.current, { rotationX: 0, rotationY: 0 });
 
-    imageContainerRef.current?.addEventListener("mousemove", handleMouseMove);
-    imageContainerRef.current?.addEventListener("mouseleave", handleMouseLeave);
+      const handleMouseMove = (e: MouseEvent) => {
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        
+        // Calculate relative pos: -1 to +1
+        const relX = (e.clientX - centerX) / centerX;
+        const relY = (e.clientY - centerY) / centerY;
 
-    return () => {
-      imageContainerRef.current?.removeEventListener("mousemove", handleMouseMove);
-      imageContainerRef.current?.removeEventListener("mouseleave", handleMouseLeave);
-    };
+        // Apply gentle rotation based on mouse
+        gsap.to(imageInnerRef.current, {
+          rotationY: relX * 12,
+          rotationX: -relY * 12,
+          duration: 1,
+          ease: "power3.out"
+        });
 
+        // Move accent light source
+        gsap.to(lightRef.current, {
+          x: relX * 100,
+          y: relY * 100,
+          duration: 1,
+          ease: "power3.out"
+        });
+      };
+
+      const handleMouseEnter = () => {
+        gsap.to(imageInnerRef.current, { scale: 1.03, duration: 0.5, ease: "power2.out" });
+      };
+
+      const handleMouseLeave = () => {
+        gsap.to(imageInnerRef.current, { rotationX: 0, rotationY: 0, scale: 1, duration: 0.5, ease: "power2.out" });
+        gsap.to(lightRef.current, { x: 0, y: 0, duration: 0.5 });
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+      
+      const imageEl = imageInnerRef.current;
+      if (imageEl) {
+        imageEl.addEventListener("mouseenter", handleMouseEnter);
+        imageEl.addEventListener("mouseleave", handleMouseLeave);
+      }
+
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        if (imageEl) {
+          imageEl.removeEventListener("mouseenter", handleMouseEnter);
+          imageEl.removeEventListener("mouseleave", handleMouseLeave);
+        }
+      };
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full min-h-screen flex items-center justify-center pt-24 pb-12 px-6 md:px-12 opacity-0 overflow-hidden"
-    >
-      <div className="absolute top-0 right-0 w-[50vh] h-[50vh] bg-blue-600/10 rounded-full blur-[120px] -z-10" />
+    <section ref={sectionRef} className="relative w-full min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden bg-[#fbfbfb]">
+      
+      {/* Background Soft Glows */}
+      <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-purple-100 rounded-full blur-[120px] opacity-70 pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-blue-50 rounded-full blur-[100px] opacity-60 pointer-events-none" />
 
-      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 items-center z-10">
+      <div className="section-wrapper relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-20">
         
-        {/* Left Side: Flawless Segmented Portrait Animation */}
-        <div className="flex justify-center md:justify-start perspective-1000">
-          <div 
-            ref={imageContainerRef}
-            className="relative w-[280px] h-[400px] lg:w-[400px] lg:h-[550px] flex group border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transform-style-3d cursor-crosshair"
-          >
-            {/* Overlay Gradient for luxury feel */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-20 pointer-events-none mix-blend-multiply opacity-50 group-hover:opacity-30 transition-opacity duration-700" />
-            
-            {/* Slice 1 */}
-            <div ref={slice1Ref} className="relative w-1/4 h-full overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-[1s]">
-              <div className="absolute top-0 h-full w-[400%] left-[0%]">
-                <Image src="/profile.png" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover object-top" alt="Nimal" priority />
-              </div>
+        {/* LEFT TEXT */}
+        <div className="w-full md:w-1/2 flex flex-col items-start text-left z-20">
+          <div className="mb-6 overflow-hidden">
+            <div ref={(el) => { headingRefs.current[0] = el; }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="text-sm font-medium tracking-wide text-gray-600">Available for freelance</span>
             </div>
+          </div>
+          
+          <div className="overflow-hidden mb-4">
+            <h1 ref={(el) => { headingRefs.current[1] = el; }} className="text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1] font-serif">
+              I build <span className="text-gradient-accent italic pr-2">premium</span>
+            </h1>
+          </div>
+          <div className="overflow-hidden mb-6">
+            <h1 ref={(el) => { headingRefs.current[2] = el; }} className="text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1] font-serif">
+              websites that
+            </h1>
+          </div>
+          <div className="overflow-hidden mb-8">
+            <h1 ref={(el) => { headingRefs.current[3] = el; }} className="text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1] font-serif">
+              grow your business.
+            </h1>
+          </div>
 
-            {/* Slice 2 */}
-            <div ref={slice2Ref} className="relative w-1/4 h-full overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-[1s]">
-              <div className="absolute top-0 h-full w-[400%] left-[-100%]">
-                <Image src="/profile.png" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover object-top" alt="Nimal" priority />
-              </div>
-            </div>
+          <div className="overflow-hidden mb-12">
+            <p ref={(el) => { headingRefs.current[4] = el; }} className="text-lg md:text-xl text-gray-500 font-light max-w-lg leading-relaxed">
+              Elevating brands with Awwwards-tier design, seamless animations, and high-performance engineering.
+            </p>
+          </div>
 
-            {/* Slice 3 */}
-            <div ref={slice3Ref} className="relative w-1/4 h-full overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-[1s]">
-              <div className="absolute top-0 h-full w-[400%] left-[-200%]">
-                <Image src="/profile.png" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover object-top" alt="Nimal" priority />
-              </div>
+          <div className="overflow-hidden">
+            <div ref={(el) => { headingRefs.current[5] = el; }} className="flex flex-wrap items-center gap-4 text-white">
+              <a href="#work" className="group relative overflow-hidden rounded-full bg-gray-900 px-8 py-4 text-white hover-lift font-medium" style={{ color: "#ffffff" }}>
+                <span className="relative z-10 flex items-center text-white gap-2">
+                  View Work
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform stroke-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-var(--accentColor) opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </a>
+              <a href="#contact" className="rounded-full px-8 py-4 font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover-lift transition-all">
+                Contact Me
+              </a>
             </div>
-
-            {/* Slice 4 */}
-            <div ref={slice4Ref} className="relative w-1/4 h-full overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-[1s]">
-              <div className="absolute top-0 h-full w-[400%] left-[-300%]">
-                <Image src="/profile.png" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover object-top" alt="Nimal" priority />
-              </div>
-            </div>
-            
           </div>
         </div>
 
-        {/* Right Side: Typography Sequence */}
-        <div className="flex flex-col justify-center">
-          
-          {/* I am */}
-          <div 
-            ref={iamRef} 
-            className="text-lg md:text-2xl font-light text-gray-400 mb-2 h-8"
-          />
-          
-          {/* Huge Name */}
-          <h1 
-            ref={nameRef}
-            className="text-6xl sm:text-7xl lg:text-[8.5rem] font-bold font-outfit uppercase leading-[0.85] tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-100 to-gray-600 drop-shadow-lg opacity-0"
-            style={{ transformOrigin: "0% 50%" }}
-          >
-            NIMAL .
-          </h1>
-          
-          {/* Role */}
-          <div className="w-full text-left md:text-right mt-6 pr-2">
+        {/* RIGHT IMAGE (Cropped, 3D floating) */}
+        <div className="w-full md:w-1/2 flex justify-center lg:justify-end z-10">
+          <div className="hero-image-wrapper relative w-[80%] max-w-[450px] aspect-[4/5] perspective-1000">
+            {/* Soft backdrop shadow */}
+            <div className="absolute inset-x-10 -bottom-10 h-1/2 bg-purple-300/30 blur-3xl rounded-full"></div>
+            
             <div 
-              ref={roleRef} 
-              className="inline-block text-2xl md:text-4xl font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 font-outfit tracking-wide h-12"
-            />
-          </div>
+              ref={imageInnerRef} 
+              className="w-full h-full relative rounded-3xl overflow-hidden glass-panel border border-white/60 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transform-style-3d will-change-transform bg-white/40"
+            >
+              {/* Inner ambient light follower */}
+              <div ref={lightRef} className="absolute inset-0 flex items-center justify-center opacity-30 mix-blend-overlay pointer-events-none z-20">
+                <div className="w-[150%] h-[150%] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_0%,transparent_50%)]"></div>
+              </div>
 
-          {/* Description */}
-          <div 
-            ref={descRef}
-            className="mt-8 md:mt-16 text-lg md:text-2xl font-light text-gray-400 leading-relaxed max-w-lg opacity-0"
-          >
-            Every scroll reveals a chapter — walk through my journey and see how it all began.
+              {/* The Image (Cropped) */}
+              <div className="absolute inset-0 z-10 w-full h-full transform translate-z-[30px]">
+                <Image 
+                  src="/profile.png" 
+                  alt="Nimal" 
+                  fill 
+                  className="object-cover object-top filter contrast-[1.05] brightness-105"
+                  priority
+                  unoptimized
+                />
+              </div>
+
+              {/* Minimal UI overlay elements for premium tech feel */}
+              <div className="absolute top-6 left-6 z-30 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/50 shadow-sm text-xs font-semibold text-gray-800 translate-z-[40px]">
+                Creative Developer
+              </div>
+              <div className="absolute bottom-6 right-6 z-30 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/50 shadow-sm text-xs font-semibold text-gray-800 translate-z-[40px]">
+                UI/UX Designer
+              </div>
+            </div>
           </div>
         </div>
 

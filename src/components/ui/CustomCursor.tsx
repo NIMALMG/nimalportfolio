@@ -5,108 +5,89 @@ import gsap from "gsap";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const followerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Hide native cursor only if we are on desktop
-    if (window.innerWidth >= 768) {
-      const cursor = cursorRef.current;
-      const follower = followerRef.current;
-      if (!cursor || !follower) return;
+    // ══════════════════════════════════════════════════════════
+    // REFERENCE: Cursor.tsx — EXACT clone
+    // Manual rAF lerp loop with delay=6
+    // gsap.to(cursor, { x, y, duration: 0.1 })
+    // mix-blend-mode: difference
+    // 50px size (from Cursor.css)
+    // cursor-icons on [data-cursor] hover — snaps to element
+    // cursor-disable hides cursor
+    // ══════════════════════════════════════════════════════════
+    if (window.innerWidth < 600) return;
 
-      // GSAP quickTo is an advanced Awwwards technique to highly optimize rapid event dispatching
-      // It bypasses timeline initialization overhead per mouse move.
-      // Set cursor way off screen and hidden initially to prevent the 0,0 top-left glitch!
-      gsap.set([cursor, follower], { x: window.innerWidth / 2, y: window.innerHeight / 2, opacity: 0 });
+    const cursor = cursorRef.current;
+    if (!cursor) return;
 
-      let hasMoved = false;
+    let hover = false;
+    const mousePos = { x: 0, y: 0 };
+    const cursorPos = { x: 0, y: 0 };
 
-      const xToCursor = gsap.quickTo(cursor, "x", { duration: 0, ease: "none" });
-      const yToCursor = gsap.quickTo(cursor, "y", { duration: 0, ease: "none" });
+    // REFERENCE line 12-15: track raw mouse position
+    const onMouseMove = (e: MouseEvent) => {
+      mousePos.x = e.clientX;
+      mousePos.y = e.clientY;
+    };
+    document.addEventListener("mousemove", onMouseMove);
 
-      const xToFollower = gsap.quickTo(follower, "x", { duration: 0.6, ease: "power3" });
-      const yToFollower = gsap.quickTo(follower, "y", { duration: 0.6, ease: "power3" });
+    // REFERENCE line 16-25: rAF loop with lerp delay=6
+    let rafId: number;
+    const loop = () => {
+      if (!hover) {
+        const delay = 6; // EXACT from reference line 18
+        cursorPos.x += (mousePos.x - cursorPos.x) / delay;
+        cursorPos.y += (mousePos.y - cursorPos.y) / delay;
+        gsap.to(cursor, { x: cursorPos.x, y: cursorPos.y, duration: 0.1 }); // EXACT reference line 21
+      }
+      rafId = requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
 
-      const onMouseMove = (e: MouseEvent) => {
-        if (!hasMoved) {
-          hasMoved = true;
-          gsap.to([cursor, follower], { opacity: 1, duration: 0.5, ease: "power2.out" });
-        }
+    // REFERENCE line 26-48: data-cursor hover behavior
+    const hoverListeners: Array<{ el: HTMLElement; over: (e: MouseEvent) => void; out: () => void }> = [];
 
-        xToCursor(e.clientX);
-        yToCursor(e.clientY);
+    const setupHovers = () => {
+      // Interactive elements (links, buttons) act like data-cursor="disable" — shrink cursor
+      document.querySelectorAll("a, button").forEach((item) => {
+        const element = item as HTMLElement;
+        const overHandler = () => {
+          cursor.classList.add("cursor-hover");
+        };
+        const outHandler = () => {
+          cursor.classList.remove("cursor-hover");
+        };
+        element.addEventListener("mouseover", overHandler);
+        element.addEventListener("mouseout", outHandler);
+        hoverListeners.push({ el: element, over: overHandler, out: outHandler });
+      });
+    };
 
-        xToFollower(e.clientX);
-        yToFollower(e.clientY);
-      };
+    // Delay setup slightly so DOM is ready
+    const setupTimeout = setTimeout(setupHovers, 500);
 
-      // Premium magnetic scaling on interactive elements
-      const handleMouseOver = (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        const isInteractive = 
-          target.tagName === 'A' || 
-          target.tagName === 'BUTTON' || 
-          target.closest('a') || 
-          target.closest('button') ||
-          target.classList.contains('group');
-
-        const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
-
-        if (isInteractive) {
-          gsap.to(follower, {
-            scale: 1.8,
-            backgroundColor: "rgba(37, 99, 235, 0.05)",
-            borderColor: "rgba(37, 99, 235, 0.6)",
-            filter: "blur(2px)",
-            duration: 0.4,
-            ease: "expo.out"
-          });
-          gsap.to(cursor, { scale: 0, duration: 0.2 }); // hide dot on hover
-        } else if (isInput) {
-          gsap.to(follower, {
-            scale: 0.5,
-            borderRadius: "0px",
-            borderColor: "#fff",
-            duration: 0.3
-          });
-        }
-      };
-
-      const handleMouseOut = () => {
-        gsap.to(follower, {
-          scale: 1,
-          backgroundColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 0.3)",
-          filter: "blur(0px)",
-          borderRadius: "9999px",
-          duration: 0.4,
-          ease: "expo.out"
-        });
-        gsap.to(cursor, { scale: 1, duration: 0.2 });
-      };
-
-      window.addEventListener("mousemove", onMouseMove);
-      document.body.addEventListener("mouseover", handleMouseOver);
-      document.body.addEventListener("mouseout", handleMouseOut);
-
-      return () => {
-        window.removeEventListener("mousemove", onMouseMove);
-        document.body.removeEventListener("mouseover", handleMouseOver);
-        document.body.removeEventListener("mouseout", handleMouseOut);
-      };
-    }
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      cancelAnimationFrame(rafId);
+      clearTimeout(setupTimeout);
+      hoverListeners.forEach(({ el, over, out }) => {
+        el.removeEventListener("mouseover", over);
+        el.removeEventListener("mouseout", out);
+      });
+    };
   }, []);
 
   return (
-    <div className="hidden md:block pointer-events-none z-[99999]">
-      <div 
-        ref={cursorRef} 
-        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 mix-blend-difference"
+    <>
+      {/* REFERENCE Cursor.css: 50px, mix-blend-mode: difference, rounded, purple glow
+          --size: 50px; background-color: #e6c3ff;
+          box-shadow: 0px 0px 30px 0px rgb(175, 131, 255);
+          mix-blend-mode: difference */}
+      <div
+        ref={cursorRef}
+        className="cursor-main hidden md:block"
       />
-      <div 
-        ref={followerRef} 
-        className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full -translate-x-1/2 -translate-y-1/2 transition-colors duration-150 backdrop-blur-[1px]"
-      />
-    </div>
+    </>
   );
 }

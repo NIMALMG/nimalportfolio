@@ -6,107 +6,69 @@ import gsap from "gsap";
 export default function Preloader() {
   const [show, setShow] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const textContainerRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // We run it every time for dev preview, normally wrapped in sessionStorage
-    // const hasVisited = sessionStorage.getItem("hasVisited");
-    // if (hasVisited) { setShow(false); return; }
+    if (!show) return;
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflowY = "hidden";
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        onComplete: () => {
-          sessionStorage.setItem("hasVisited", "true");
-          document.body.style.overflow = "";
-          setShow(false);
-        },
-      });
-
-      const chars = textContainerRef.current?.querySelectorAll('.char');
-
-      if (chars) {
-        // Dramatic cinematic reveal
-        tl.fromTo(
-          chars,
-          { 
-            y: 100, 
-            opacity: 0, 
-            rotateX: -90, 
-            rotateY: 45, 
-            filter: "blur(15px)",
-            scale: 0.8
-          },
-          {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            rotateY: 0,
-            filter: "blur(0px)",
-            scale: 1,
-            stagger: 0.05,
-            duration: 1.5,
-            ease: "expo.out",
-          }
-        )
-        // Glow pulse effect
-        .to(chars, {
-          textShadow: "0px 0px 20px rgba(255,255,255,0.8)",
-          duration: 0.5,
-          yoyo: true,
-          repeat: 1
-        })
-        // Dramatic exit
-        .to(chars, {
-          y: -50,
-          opacity: 0,
-          filter: "blur(10px)",
-          scale: 1.1,
-          stagger: 0.03,
-          duration: 0.8,
-          ease: "power4.in",
-          delay: 0.2
-        })
-        .to(
-          containerRef.current,
-          {
-            opacity: 0,
-            duration: 1,
-            ease: "power2.inOut",
-          },
-          "-=0.4"
-        );
+    const tl = gsap.timeline({
+      onComplete: () => {
+        document.body.style.overflowY = "";
+        setShow(false);
       }
-    }, containerRef);
+    });
 
-    return () => ctx.revert();
-  }, []);
+    // 1. Sleek Apple-style minimalist loading bar sweep
+    tl.to(progressRef.current, {
+      scaleX: 1,
+      duration: 1.2,
+      ease: "power2.inOut"
+    });
+
+    // 2. Logo and loader upward fade out
+    tl.to([textRef.current, progressRef.current], {
+      y: -20,
+      opacity: 0,
+      duration: 0.6,
+      ease: "power3.in"
+    }, "+=0.2");
+
+    // 3. Entire background dissolving smoothly
+    tl.to(containerRef.current, {
+      opacity: 0,
+      duration: 0.6,
+      ease: "power2.inOut"
+    });
+
+    return () => {
+      document.body.style.overflowY = "";
+    };
+  }, [show]);
 
   if (!show) return null;
-
-  // Full name for the loader
-  const fullName = "NIMAL M G".split("");
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black"
+      className="fixed inset-0 z-[999999] flex flex-col items-center justify-center bg-[#fbfbfb]"
     >
-      <div 
-        ref={textContainerRef} 
-        className="flex text-white font-outfit text-5xl md:text-8xl font-bold tracking-[0.3em] perspective-1000"
-      >
-        {fullName.map((char, index) => (
-          <span 
-            key={index} 
-            className={`char inline-block ${char === " " ? "w-6 md:w-12" : ""}`}
-            style={{ transformOrigin: "50% 100%" }}
-          >
-            {char}
-          </span>
-        ))}
-        <span className="char inline-block text-blue-500">.</span>
+      <div className="flex flex-col items-center gap-6">
+        {/* Sleek Dark Logo for Light Theme */}
+        <div ref={textRef} className="text-xl md:text-2xl font-bold font-serif text-gray-900 tracking-widest uppercase">
+          NIMAL.
+        </div>
+
+        {/* Minimal Progress Bar Track */}
+        <div className="w-48 h-[2px] bg-gray-200 rounded-full overflow-hidden">
+          {/* Active Loading Line */}
+          <div 
+            ref={progressRef}
+            className="w-full h-full bg-gray-900 origin-left scale-x-0"
+          ></div>
+        </div>
       </div>
     </div>
   );

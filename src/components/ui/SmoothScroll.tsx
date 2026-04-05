@@ -6,17 +6,20 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* ══════════════════════════════════════════════════════════
+   REFERENCE: Navbar.tsx — ScrollSmoother.create({ smooth: 1.7, speed: 1.7 })
+   Adapted to Lenis with matching duration
+   ══════════════════════════════════════════════════════════ */
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.5, // slightly longer luxury glide
+      duration: 1.7, // matches reference smooth: 1.7
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       wheelMultiplier: 0.9,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Synchronize Lenis strictly with GSAP's internal ticker to avoid multiple Animation Frames
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);
     });

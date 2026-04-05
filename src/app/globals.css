@@ -1,52 +1,143 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: #050505;
-  --color-foreground: #ffffff;
-  --color-accent: #2563eb;
-  --color-accent-glow: rgba(37, 99, 235, 0.5);
-  --color-surface: rgba(255, 255, 255, 0.05);
-  --color-surface-hover: rgba(255, 255, 255, 0.1);
+:root {
+  --backgroundColor: #fbfbfb;  /* Ultra light luxury gray-white */
+  --textColor: #1a1a1a;        /* Deep soft black */
+  --accentColor: #7c3aed;      /* Premium Purple/Indigo */
+  --highlightColor: #f3f4f6;   /* Soft slate for cards */
+  --font-geist: "Geist", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  
+  --cWidth: calc(100% - 40px);
+  --cMaxWidth: 1400px;
 }
 
-:root {
-  --background: #050505;
-  --foreground: #ffffff;
+@theme inline {
+  --color-background: var(--backgroundColor);
+  --color-foreground: var(--textColor);
+  --color-accent: var(--accentColor);
+  --color-surface: #ffffff;
+  --font-geist: var(--font-geist);
+  --font-inter: var(--font-inter);
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), sans-serif;
+  margin: 0;
+  background-color: var(--backgroundColor);
+  color: var(--textColor);
+  font-family: var(--font-inter);
   overflow-x: hidden;
+  max-width: 100vw;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-image: radial-gradient(
-    circle at 50% 0%,
-    rgba(25, 25, 40, 1) 0%,
-    rgba(5, 5, 5, 1) 40%
-  );
-  min-height: 100vh;
 }
 
-/* Hide scrollbar completely for a premium app-like feel */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-geist);
+}
+
+/* Hide scrollbar */
 ::-webkit-scrollbar {
   display: none;
 }
 * {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 ::selection {
-  background: var(--color-accent);
+  background: var(--accentColor);
   color: #fff;
 }
 
-.glass {
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* ══════════════════════════════════════════════════════════
+   Cursor System
+   ══════════════════════════════════════════════════════════ */
+.cursor-main {
+  --size: 0px;
+  position: fixed;
+  top: calc(var(--size) / -2);
+  left: calc(var(--size) / -2);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50px;
+  pointer-events: none;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  transition: top 0.15s ease-out, left 0.15s ease-out, width 0.3s ease-out, height 0.3s ease-out, background-color 0.3s;
+}
+
+.cursor-hover {
+  background-color: transparent !important;
+  border: 2px solid var(--accentColor) !important;
+  backdrop-filter: blur(0px) !important;
+  transform: scale(1.5);
+}
+
+@media only screen and (min-width: 600px) {
+  .cursor-main {
+    --size: 40px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Layout Utilities
+   ══════════════════════════════════════════════════════════ */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+.hover-lift {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(90deg, #111, #555);
+}
+
+.text-gradient-accent {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(135deg, var(--accentColor), #c084fc);
+}
+
+/* Reusable Container */
+.section-wrapper {
+  width: 100%;
+  max-width: var(--cMaxWidth);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+@media (min-width: 768px) {
+  .section-wrapper {
+    padding: 0 40px;
+  }
+}
+@media (min-width: 1280px) {
+  .section-wrapper {
+    padding: 0 80px;
+  }
+}
+
+/* Smooth text reveal utility for GSAP */
+.split-line {
+  overflow: hidden;
 }

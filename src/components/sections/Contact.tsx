@@ -4,77 +4,111 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export default function Contact() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
     const ctx = gsap.context(() => {
+      // Scale and fade up entrance for massive impact
       gsap.fromTo(
-        ".reveal-contact",
-        { y: 50, opacity: 0 },
+        ".contact-reveal",
+        { y: 100, opacity: 0, scale: 0.95 },
         {
           y: 0,
           opacity: 1,
-          stagger: 0.15,
-          duration: 1,
-          ease: "power3.out",
+          scale: 1,
+          duration: 1.5,
+          stagger: 0.2,
+          ease: "expo.out",
           scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-          },
+            trigger: sectionRef.current,
+            start: "top 75%",
+            toggleActions: "play pause resume reverse"
+          }
         }
       );
-    }, containerRef);
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      id="contact"
-      className="py-32 px-6 md:px-12 border-t border-white/5 relative overflow-hidden flex flex-col items-center"
-      ref={containerRef}
-    >
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-purple-600/10 blur-[150px] -z-10 rounded-full pointer-events-none" />
+    <section id="contact" ref={sectionRef} className="w-full bg-[#fbfbfb] pt-32 pb-64 lg:pt-48 relative overflow-hidden border-t border-gray-100">
       
-      <div className="max-w-4xl w-full text-center space-y-12 reveal-contact">
-        <h2 className="text-5xl md:text-8xl font-bold font-outfit text-white leading-tight">
-          Let’s build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">great together</span>
-        </h2>
-        
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto reveal-contact">
-          Ready to elevate your online presence? Drop me a message and let's craft a premium digital experience.
-        </p>
+      {/* Absolute Ambient Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[100vw] h-[100vw] max-w-[1200px] max-h-[1200px] bg-gradient-to-b from-purple-100/50 to-transparent rounded-full blur-[100px] opacity-60"></div>
+      </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 reveal-contact">
+      <div className="section-wrapper relative z-10 flex flex-col items-center text-center">
+        
+        <div className="contact-reveal inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm mb-10">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span className="text-xs font-semibold tracking-[0.2em] text-gray-500 uppercase">Available for work</span>
+        </div>
+
+        <h2 className="contact-reveal text-5xl md:text-7xl lg:text-8xl xl:text-[7rem] font-serif font-black text-gray-900 tracking-tight leading-[1] max-w-5xl mb-12">
+          Let’s build something <span className="text-gradient-accent italic pr-2">great</span> together.
+        </h2>
+
+        <div className="contact-reveal flex flex-col sm:flex-row items-center gap-6 mt-8">
           <a
             href="mailto:nimalmgaiml@gmail.com"
-            className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-transform duration-300 hover:scale-105"
+            className="group relative overflow-hidden rounded-full bg-gray-900 px-10 py-5 text-white hover-lift font-medium text-lg w-full sm:w-auto"
+            style={{ color: "#ffffff" }}
           >
-            Send an Email
-          </a>
-          <a
-            href="https://wa.me/916381193366" target="_blank" rel="noreferrer"
-            className="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/20 text-white font-semibold rounded-full hover:bg-white/10 transition-transform duration-300 hover:scale-105 flex items-center justify-center"
-          >
-            <svg 
-              className="w-5 h-5 mr-2 text-green-500" 
-              fill="currentColor" 
-              viewBox="0 0 24 24" 
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.027 6.988 2.895a9.85 9.85 0 0 1 2.895 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413Z"/>
-            </svg>
-            WhatsApp
+            <span className="relative z-10 flex items-center justify-center gap-3 text-white">
+              Send an Email
+              <svg className="w-5 h-5 group-hover:block transition-transform stroke-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+            <div className="absolute inset-0 bg-var(--accentColor) opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </a>
         </div>
+
+        {/* Secondary Contact Links: Phone, Github, LinkedIn */}
+        <div className="contact-reveal flex flex-wrap items-center justify-center gap-8 md:gap-12 mt-16 pt-12 border-t border-gray-200 w-full max-w-3xl mx-auto">
+          
+          <a href="tel:+910000000000" className="flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors group">
+            <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:-translate-y-1 transition-transform bg-white shadow-sm">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+            <span className="font-medium text-sm tracking-wide uppercase">Call Me</span>
+          </a>
+
+          <a href="https://github.com/NIMALMG" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors group">
+            <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:-translate-y-1 transition-transform bg-white shadow-sm">
+              <svg className="w-5 h-5 fill-currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+            </div>
+            <span className="font-medium text-sm tracking-wide uppercase">GitHub</span>
+          </a>
+
+          <a href="https://www.linkedin.com/in/nimal-mg/" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-500 hover:text-[#0A66C2] transition-colors group">
+            <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:-translate-y-1 transition-transform bg-white shadow-sm">
+              <svg className="w-4 h-4 fill-currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+              </svg>
+            </div>
+            <span className="font-medium text-sm tracking-wide uppercase">LinkedIn</span>
+          </a>
+
+        </div>
       </div>
-      
-      <div className="absolute bottom-6 text-gray-500 text-sm reveal-contact">
-        © {new Date().getFullYear()} Nimal. All rights reserved.
+
+      {/* Footer minimal signature */}
+      <div className="absolute bottom-10 left-0 w-full text-center z-10">
+        <p className="text-sm font-medium text-gray-400">
+          © {new Date().getFullYear()} Nimal. All rights reserved.
+        </p>
       </div>
+
     </section>
   );
 }
